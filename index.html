@@ -772,7 +772,7 @@
 </footer>
 
 <script>
-  function handleSubmit() {
+  async function handleSubmit() {
     const name = document.getElementById('name').value.trim();
     const email = document.getElementById('email').value.trim();
     const msg = document.getElementById('message').value.trim();
@@ -780,7 +780,30 @@
       alert('Please fill in all fields.');
       return;
     }
-    alert('Thanks ' + name + '! This is a demo — connect Formspree to send real emails.');
+    const btn = document.querySelector('.btn-submit');
+    btn.textContent = 'Sending…';
+    btn.disabled = true;
+    try {
+      const res = await fetch('https://formspree.io/f/xbdbaano', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ name, email, message: msg })
+      });
+      if (res.ok) {
+        btn.textContent = 'Message sent ✓';
+        document.getElementById('name').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('message').value = '';
+      } else {
+        btn.textContent = 'Send message';
+        btn.disabled = false;
+        alert('Something went wrong. Please try again.');
+      }
+    } catch(e) {
+      btn.textContent = 'Send message';
+      btn.disabled = false;
+      alert('Network error. Please try again.');
+    }
   }
 </script>
 </body>
